@@ -1,0 +1,58 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "1.0"
+group = "com.github.ubiquitousspice"
+archivesBaseName = "ModularMachines"
+ext.modId = "MM"
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (!taskGraph.hasTask(release)) {
+        version += '-SNAPSHOT'
+    }
+}
+
+task release(dependsOn: 'build') << {
+    println 'Release deploy!'
+}
+
+minecraft {
+    version = "1.7.2-10.12.1.1082"
+    replaceIn "ModProps.java"
+    replace "@VERSION@", version
+}
+
+println "Building ModularMachines version ${project.version} for Minecraft ${project.minecraft.version}"
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        expand([
+                'version': project.version,
+                'mcversion': project.minecraft.version,
+                'name': project.archivesBaseName,
+                'modId': project.modId
+        ])
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
