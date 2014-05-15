@@ -22,8 +22,13 @@ public abstract class MMTileBlock extends MMBaiscBlock implements ITileEntityPro
 
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
         super.breakBlock(world, x, y, z, block, meta);
+        world.removeTileEntity(x, y, z);
+    }
+
+    public boolean onBlockEventReceived(World world, int x, int y, int z, int eventID, int meta) {
+        super.onBlockEventReceived(world, x, y, z, eventID, meta);
         TileEntity tileEntity = world.getTileEntity(x, y, z);
-        return tileEntity != null ? tileEntity.receiveClientEvent() : false;
+        return tileEntity != null ? tileEntity.receiveClientEvent(eventID, meta) : false;
     }
 
 }
