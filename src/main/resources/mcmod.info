@@ -1,14 +1,14 @@
 [
 {
-  "modid": "MM",
-  "name": "ModularMachines",
-  "description": "Example placeholder mod.",
+  "modid": "bloodstains",
+  "name": "BloodStains",
+  "description": "Blood stains that allow you to see how you and other players died.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["AbrarSyed", "GUIpsp", "Royalixor"],
-  "credits": "The Forge and FML guys, for making this example",
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

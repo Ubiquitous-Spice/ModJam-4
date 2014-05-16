@@ -19,40 +19,53 @@ apply plugin: 'forge'
 
 version = "1.0"
 group = "com.github.ubiquitousspice"
-archivesBaseName = "ModularMachines"
-ext.modId = "MM"
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if (!taskGraph.hasTask(release)) {
-        version += '-SNAPSHOT'
-    }
-}
-
-task release(dependsOn: 'build') << {
-    println 'Release deploy!'
-}
+archivesBaseName = "BloodStains"
 
 minecraft {
     version = "1.7.2-10.12.1.1082"
-    replaceIn "ModProps.java"
+    replaceIn "BloodStains.java"
     replace "@VERSION@", version
 }
 
-println "Building ModularMachines version ${project.version} for Minecraft ${project.minecraft.version}"
-
 processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-        expand([
-                'version': project.version,
-                'mcversion': project.minecraft.version,
-                'name': project.archivesBaseName,
-                'modId': project.modId
-        ])
+    // replace stuff in text files, not binary ones.
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.info'
+
+        // replace version and MCVersion
+        // forge version is also accessible via project.minecraftforgeVersion
+        // it contains the full minecraft version, including buildNumber
+        expand 'version':project.version, 'mcversion':project.minecraft.version
     }
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+    // copy everything else, thats not text
+    from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
+}
+
+
+// because the normal output has been made to be obfuscated
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'dev'
+}
+
+// add a source jar
+task sourceJar(type: Jar, dependsOn: "sourceMainJava") {
+    from "build/sources/java"
+    classifier = 'sources'
+}
+
+// add a javadoc jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+    archives javadocJar
 }
