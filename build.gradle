@@ -45,6 +45,12 @@ processResources {
     from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
 }
 
+dependencies {
+    // all hail annotations
+    compile 'org.projectlombok:lombok:1.12.6'
+    compile 'com.google.gag:gag:1.0.1'
+}
+
 
 // because the normal output has been made to be obfuscated
 task deobfJar(type: Jar) {
