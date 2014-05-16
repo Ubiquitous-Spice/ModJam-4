@@ -1,7 +1,5 @@
 package com.github.ubiquitousspice.bloodstains.data;
 
-import java.util.UUID;
-
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,27 +9,23 @@ import net.minecraft.item.ItemStack;
 @ToString
 public class PlayerState
 {
-    // identification
-    public final UUID        uid;
-    public final String      username;
-
     // equipment
     public final ItemStack   currentHeldItem;
     public final ItemStack[] armour;
 
     // location
+    public final int dimension;
     public final double      x, y, z;
     public final float       yaw, headYaw;
 
     // health and well bieng
     public final int         food;
     public final float       health;
+    
+    // TODO: account for drowning, fire death, hit status, and flying/falling
 
     public PlayerState(EntityPlayer player)
     {
-        uid = player.getPersistentID();
-        username = player.getDisplayName();
-
         // equoment
         currentHeldItem = player.getHeldItem() == null ? null : player.getHeldItem().copy();
         armour = new ItemStack[player.inventory.armorInventory.length];
@@ -41,6 +35,7 @@ public class PlayerState
         }
 
         // location
+        dimension = player.worldObj.provider.dimensionId;
         x = player.posX;
         y = player.posY;
         z = player.posZ;
@@ -54,10 +49,6 @@ public class PlayerState
 
     public PlayerState(PlayerState base, PlayerStateOverlay overlay)
     {
-        // ID
-        uid = base.uid;
-        username = base.username;
-
         // equppped
         currentHeldItem = overlay.heldChange ? overlay.currentHeldItem : base.currentHeldItem;
         
@@ -69,6 +60,7 @@ public class PlayerState
         }
         
         // location
+        dimension = overlay.dimChange ? overlay.dimension : base.dimension;
         x = overlay.positionChange ? overlay.x : base.x;
         y = overlay.positionChange ? overlay.y : base.y;
         z = overlay.positionChange ? overlay.z : base.z;

@@ -8,13 +8,14 @@ import net.minecraft.item.ItemStack;
 @ToString
 public class PlayerStateOverlay
 {
-    public final boolean     heldChange, positionChange, yawChange, healthChange;
+    public final boolean     heldChange, positionChange, dimChange, yawChange, healthChange;
 
     public final boolean[]   armourChanges;
     public final ItemStack   currentHeldItem;
     public final ItemStack[] armour;
 
     // location
+    public final int         dimension;
     public final double      x, y, z;
     public final float       yaw, headYaw;
 
@@ -22,17 +23,12 @@ public class PlayerStateOverlay
     public final int         food;
     public final float       health;
 
+    // TODO: account for drowning, fire death, hit status, and flying/falling
+
     public PlayerStateOverlay(PlayerState base, PlayerState next)
     {
         // equipped item
-        if (heldChange = !ItemStack.areItemStacksEqual(base.currentHeldItem, next.currentHeldItem))
-        {
-            currentHeldItem = next.currentHeldItem;
-        }
-        else
-        {
-            currentHeldItem = null;
-        }
+        currentHeldItem = (heldChange = !ItemStack.areItemStacksEqual(base.currentHeldItem, next.currentHeldItem)) ? next.currentHeldItem : base.currentHeldItem;
 
         // armor
         armourChanges = new boolean[base.armour.length];
@@ -45,7 +41,9 @@ public class PlayerStateOverlay
             }
         }
 
-        // location
+        // location.
+        dimension = (dimChange = !(base.dimension == next.dimension)) ? next.dimension : base.dimension;
+
         if (positionChange = !(base.x == next.x && base.y == next.y && base.z == next.z))
         {
             x = next.x;

@@ -1,9 +1,8 @@
 package com.github.ubiquitousspice.bloodstains.data;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
-
-import org.apache.logging.log4j.LogManager;
 
 import com.google.common.collect.Lists;
 
@@ -18,10 +17,10 @@ public class PlayerStateContainer
 
     public static final int                      MAX_TICKS = 400;
 
-    public PlayerStateContainer(PlayerState state)
+    public PlayerStateContainer(UUID uid, String username, PlayerState state)
     {
-        uid = state.uid;
-        username = state.username;
+        this.uid = uid;
+        this.username = username;
         oldest = newest = state;
     }
 
@@ -32,18 +31,40 @@ public class PlayerStateContainer
         overlays.push(overlay);
         size++;
 
-        LogManager.getLogger().trace("Adding state for player '{}', now there are {} states", username, size);
-
         // check for size
         if (size > MAX_TICKS)
         {
             size = MAX_TICKS;
-            overlay = overlays.pop();
+            overlay = overlays.peekLast();
+            
+            if (overlay != null)
+                overlays.removeLast();
+            
+            if (overlay == null)
+            {
+                throw new IllegalArgumentException("Overlay is null!!!  Size="+size+"  and overlays="+overlays);
+            }
+            
             oldest = new PlayerState(oldest, overlay);
-
-            LogManager.getLogger().trace("Too many states! Updating base!");
         }
     }
 
-    // TODO: add util methods for playback
+    @SuppressWarnings("unchecked")
+    public BloodStain getBloodStain(boolean clean)
+    {
+        // TODO: search for a suitable base location for the bloodstain?
+        // CUt off dimensional travel... maybe.. unless mystcraft
+        // maybe some special handling for falling to death or drowning.
+        
+        BloodStain stain = new BloodStain(username, oldest, (List<PlayerStateOverlay>) overlays.clone());
+        
+        if (clean)
+        {
+            overlays.clear();
+            oldest = newest;
+            size   = 0;
+        }
+        
+        return stain;
+    }
 }
