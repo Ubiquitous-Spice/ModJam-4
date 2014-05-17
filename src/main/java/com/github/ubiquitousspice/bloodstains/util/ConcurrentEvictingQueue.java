@@ -123,8 +123,4 @@ public final class ConcurrentEvictingQueue<E> extends ForwardingQueue<E>
 	{
 		return delegate().remove(checkNotNull(object));
 	}
-
-	// TODO(user): Do we want to checkNotNull each element in containsAll, removeAll, and retainAll?
-
-	// TODO(user): Do we want to add EvictingQueue#isFull()?
 }
