@@ -1,25 +1,22 @@
 package com.github.ubiquitousspice.bloodstains;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-
-import org.apache.logging.log4j.LogManager;
-
 import com.github.ubiquitousspice.bloodstains.data.BloodStain;
 import com.github.ubiquitousspice.bloodstains.data.PlayerState;
 import com.github.ubiquitousspice.bloodstains.data.PlayerStateContainer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class StainManager
 {
@@ -53,15 +50,9 @@ public class StainManager
         }
         else
         {
-//            // execute new thread;
-//            new Thread() {
-//                public void run()
-//                {
-                    containers.get(e.player.getUniqueID()).addState(state);
-//                }
-//            }.start();
-        }
-    }
+			container.addState(state);
+		}
+	}
 
     @SubscribeEvent
     public void playerDeath(LivingDeathEvent e)
