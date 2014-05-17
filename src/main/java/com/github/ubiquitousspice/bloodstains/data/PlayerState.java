@@ -120,10 +120,13 @@ public class PlayerState
     private static void writeItem(DataOutput output, ItemStack item) throws IOException
     {
         // write a boolean for null status
-        output.writeBoolean(item != null);
         if (item == null)
+        {
+            output.writeBoolean(false);
             return; // done
+        }
 
+        output.writeBoolean(true);
         NBTTagCompound compound = new NBTTagCompound();
         item.writeToNBT(compound);
         CompressedStreamTools.write(compound, output);
@@ -132,11 +135,14 @@ public class PlayerState
     private static ItemStack readItem(DataInput input) throws IOException
     {
         // write a boolean for null status
-        if (!input.readBoolean())
-            return null; // done
+        boolean isNotNull = input.readBoolean(); 
+        if (isNotNull) // true, not null
+        {
+            NBTTagCompound compound = CompressedStreamTools.read(input);
 
-        NBTTagCompound compound = CompressedStreamTools.read(input);
-
-        return ItemStack.loadItemStackFromNBT(compound);
+            return ItemStack.loadItemStackFromNBT(compound);
+        }
+        
+        return null;
     }
 }

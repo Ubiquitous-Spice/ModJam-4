@@ -68,7 +68,7 @@ public class BloodStain
         double z = input.readDouble();
         
         int size = input.readInt();
-        ArrayList<PlayerState> states = new ArrayList<PlayerState>(input.readInt());
+        ArrayList<PlayerState> states = new ArrayList<PlayerState>(size);
         for (int i = 0; i < size; i++)
             states.add(PlayerState.readFrom(input));
         
