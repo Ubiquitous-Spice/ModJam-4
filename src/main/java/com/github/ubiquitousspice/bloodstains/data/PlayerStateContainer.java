@@ -28,7 +28,7 @@ public class PlayerStateContainer
 		states.add(newState);
 	}
 
-	public BloodStain getBloodStain(boolean clean)
+	public BloodStain getBloodStain()
 	{
 		// TODO: search for a suitable base location for the bloodstain?
 		// CUt off dimensional travel... maybe.. unless mystcraft

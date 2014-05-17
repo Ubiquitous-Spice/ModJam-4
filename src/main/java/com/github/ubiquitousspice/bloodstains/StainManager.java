@@ -66,8 +66,8 @@ public class StainManager
             return;
 
         // make stain, and clean.
-        BloodStain stain = container.getBloodStain(true);
-        stains.add(stain);
+		BloodStain stain = container.getBloodStain();
+		stains.add(stain);
         
         LogManager.getLogger().debug("Adding stain for {} at {}, {}, {}", stain.username, stain.x, stain.y, stain.z);
     }
