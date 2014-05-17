@@ -1,7 +1,8 @@
 package com.github.ubiquitousspice.bloodstains.data;
 
-import com.google.common.collect.EvictingQueue;
+import com.github.ubiquitousspice.bloodstains.util.ConcurrentEvictingQueue;
 
+import java.util.Queue;
 import java.util.UUID;
 
 public class PlayerStateContainer
@@ -9,7 +10,7 @@ public class PlayerStateContainer
 	public final UUID uid;
 	public final String username;
 
-	final EvictingQueue<PlayerState> states;
+	final Queue<PlayerState> states;
 
 	public static final int MAX_TICKS = 400;
 
@@ -17,7 +18,8 @@ public class PlayerStateContainer
 	{
 		this.uid = uid;
 		this.username = username;
-		states = EvictingQueue.create(MAX_TICKS);
+
+		states = ConcurrentEvictingQueue.create(MAX_TICKS);
 		states.add(state);
 	}
 

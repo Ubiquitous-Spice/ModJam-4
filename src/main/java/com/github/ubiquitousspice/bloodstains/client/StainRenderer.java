@@ -1,19 +1,16 @@
 package com.github.ubiquitousspice.bloodstains.client;
 
+import com.github.ubiquitousspice.bloodstains.StainManager;
+import com.github.ubiquitousspice.bloodstains.data.BloodStain;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import com.github.ubiquitousspice.bloodstains.StainManager;
-import com.github.ubiquitousspice.bloodstains.data.BloodStain;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class StainRenderer
@@ -38,8 +35,8 @@ public class StainRenderer
             // SETUP
             GL11.glPushMatrix();
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GL11.glTranslated(stain.x - RenderManager.renderPosX, stain.y - RenderManager.renderPosY, stain.z - RenderManager.renderPosZ);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glTranslated(stain.x - RenderManager.renderPosX, stain.y - RenderManager.renderPosY, stain.z - RenderManager.renderPosZ);
             GL11.glScalef(1.0F, -1.0F, -1.0F);
             GL11.glColor3f(255, 0, 0);
 
