@@ -19,6 +19,7 @@ package com.github.ubiquitousspice.bloodstains.util;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.collect.ForwardingQueue;
+import com.google.gag.annotation.remark.ThisWouldBeOneLineIn;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -42,6 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Beta
 @GwtIncompatible("java.util.ArrayDeque")
+@ThisWouldBeOneLineIn(language = "Haskell", toWit = "concurrency is implicit when you are immutable.")
 public final class ConcurrentEvictingQueue<E> extends ForwardingQueue<E>
 {
 
