@@ -11,6 +11,9 @@ import com.google.common.collect.Sets;
 import com.google.gag.annotation.literary.Metaphor;
 import com.google.gag.annotation.remark.Hack;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
@@ -94,7 +97,7 @@ public class StainManager
 		{
 			try
 			{
-				String url = getUrl(stain.dimId);
+				String url = getUrl(null, stain.dimId);
 				LogManager.getLogger().debug("Uploading stain for {} at {}, {}, {} to {}", stain.username, stain.x, stain.y, stain.z, url);
 				HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 				con.setDoOutput(true);
@@ -123,9 +126,9 @@ public class StainManager
 
 	}
 
-	private String getUrl(int dimId)
+	private String getUrl(String worldId, int dimID)
 	{
-		return BloodStains.OUR_SERVER_IP + "/TODOIDHERE" + "SPACERWOOTWOOTGOTTAGIVESPACE" + dimId;
+		return BloodStains.OUR_SERVER_IP + "/" + /*worldId*/"TODOIDHERE" + "SPACEEEEEEEEEEEEEEEEEEEEEEEER" + dimID;
 	}
 
 	// util and packet UI
@@ -221,15 +224,9 @@ public class StainManager
 		// old stain remover
 		PacketManager.sendToPlayer(new PacketStainRemover(e.fromDim), e.player);
 
-		Collection<BloodStain> outStains = null;
-		if (BloodStains.OUR_SERVER)
-		{
-		}
-		else
-		{
-			// send new stains
-			outStains = removeStains(e.toDim);
-		}
+		// send new stains
+		Collection<BloodStain> outStains = removeStains(e.toDim);
+
 
 		for (BloodStain stain : outStains)
 		{
@@ -249,8 +246,32 @@ public class StainManager
         }
 		if (BloodStains.OUR_SERVER)
 		{
-			List<BloodStain> a = null;
-			stains.addAll(a);
+			try
+			{
+				String url = getUrl(null, e.world.provider.dimensionId);
+				LogManager.getLogger().debug("Downloading stains from {}", url);
+				HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+				con.setUseCaches(false);
+				con.connect();
+				JsonArray root = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonArray();
+				con.disconnect();
+				Gson gson = new Gson();
+				for (JsonElement element : root)
+				{
+					try
+					{
+						stains.add(gson.fromJson(element, BloodStain.class));
+					}
+					catch (Exception t)
+					{
+						t.printStackTrace();
+					}
+				}
+			}
+			catch (Exception t)
+			{
+				t.printStackTrace();
+			}
 		}
 		else
 		{
