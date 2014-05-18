@@ -58,6 +58,12 @@ public class StainManager
     @SubscribeEvent
     public void playerTick(final PlayerTickEvent e)
     {
+        if (e.player.worldObj.isRemote)
+        {
+            // server only.
+            return;
+        }
+        
         final PlayerState state = new PlayerState(e.player);
 
         PlayerStateContainer container = containers.get(e.player.getUniqueID());
@@ -76,7 +82,12 @@ public class StainManager
     @SubscribeEvent
 	public void playerDeath(LivingDeathEvent e) throws IOException
 	{
-		if (!(e.entity instanceof EntityPlayer))
+        if (e.entity.worldObj.isRemote)
+        {
+            // server only.
+            return;
+        }
+        else if (!(e.entity instanceof EntityPlayer))
 		{
 			return;
 		}
