@@ -1,8 +1,9 @@
 package com.github.ubiquitousspice.bloodstains.client;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.github.ubiquitousspice.bloodstains.data.BloodStain;
+import com.github.ubiquitousspice.bloodstains.data.PlayerState;
+import com.google.common.collect.Lists;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.entity.Entity;
@@ -12,10 +13,8 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
-import com.github.ubiquitousspice.bloodstains.data.BloodStain;
-import com.github.ubiquitousspice.bloodstains.data.PlayerState;
-import com.google.common.collect.Lists;
-import com.mojang.authlib.GameProfile;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PlaybackPlayer extends EntityOtherPlayerMP
 {
@@ -23,8 +22,8 @@ public class PlaybackPlayer extends EntityOtherPlayerMP
     
     public PlaybackPlayer(BloodStain stain)
     {
-        super(Minecraft.getMinecraft().thePlayer.worldObj, new GameProfile("---", "TEST"));
-        this.posX = stain.x;
+		super(Minecraft.getMinecraft().thePlayer.worldObj, new GameProfile("---", stain.username));
+		this.posX = stain.x;
         this.posY = stain.y;
         this.posZ = stain.z;
         
