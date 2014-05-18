@@ -244,6 +244,7 @@ public class StainManager
             // ignore client stuff
             return;
         }
+		
 		if (BloodStains.OUR_SERVER)
 		{
 			try
