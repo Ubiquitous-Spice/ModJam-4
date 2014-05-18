@@ -3,6 +3,7 @@ package com.github.ubiquitousspice.bloodstains.data;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -26,10 +27,13 @@ public class PlayerState
     private double      x, y, z;
     private double      motX, motY, motZ;
     private float       yaw, headYaw;
-
-    private boolean     isBurning, isOnGround;
     
-    private int recentlyHit, hurtTime, hurtResistantTime;
+    // hit and hurt data
+    private int recentlyHit, hurtTime, hurtResistantTime, fireTime;
+    private float health;
+    
+    // placement data
+    private boolean     isOnGround;
 
     public PlayerState(EntityPlayer player)
     {
@@ -53,9 +57,11 @@ public class PlayerState
         headYaw = player.rotationYawHead;
 
         // burning and drowning
-        isBurning = player.isBurning();
         isOnGround = player.onGround;
         hurtTime = ObfuscationReflectionHelper.getPrivateValue(EntityLivingBase.class, player, "hurtTime", "field_70737_aN");
+        fireTime = ObfuscationReflectionHelper.getPrivateValue(Entity.class, player, "fire", "field_70151_c");
+        
+        health = player.getHealth();
     }
 
     private PlayerState() {}
@@ -70,16 +76,14 @@ public class PlayerState
         player.motionX = motX;
         player.motionY = motY;
         player.motionZ = motZ;
-        
-        player.rotationYaw = yaw;
+
         player.rotationYawHead = headYaw;
+        player.rotationYaw = yaw;
         
-        if (isBurning())
-            player.setFire(1000);
-        else
-            player.extinguish();
+        player.setHealth(health);
         
         ObfuscationReflectionHelper.setPrivateValue(EntityLivingBase.class, player, hurtTime, "hurtTime", "field_70737_aN");
+        ObfuscationReflectionHelper.setPrivateValue(Entity.class, player, fireTime, "fire", "field_70151_c");
     }
 
     public void writeTo(DataOutput output) throws IOException
@@ -102,9 +106,11 @@ public class PlayerState
         output.writeFloat(headYaw);
         
         // states
-        output.writeBoolean(isBurning);
         output.writeBoolean(isOnGround);
         output.writeInt(hurtTime);
+        output.writeInt(fireTime);
+        
+        output.writeFloat(health);
     }
 
     public static PlayerState readFrom(DataInput input) throws IOException
@@ -128,9 +134,11 @@ public class PlayerState
         state.yaw = input.readFloat();
         state.headYaw = input.readFloat();
         
-        state.isBurning = input.readBoolean();
         state.isOnGround = input.readBoolean();
         state.hurtTime = input.readInt();
+        state.fireTime = input.readInt();
+        
+        state.health = input.readFloat();
         
         return state;
     }
@@ -164,10 +172,6 @@ public class PlayerState
         return null;
     }
 
-	public ItemStack getCurrentHeldItem() {return this.currentHeldItem;}
-
-	public ItemStack[] getArmour() {return this.armour;}
-
 	public int getDimension() {return this.dimension;}
 
 	public double getX() {return this.x;}
@@ -175,24 +179,4 @@ public class PlayerState
 	public double getY() {return this.y;}
 
 	public double getZ() {return this.z;}
-
-	public double getMotX() {return this.motX;}
-
-	public double getMotY() {return this.motY;}
-
-	public double getMotZ() {return this.motZ;}
-
-	public float getYaw() {return this.yaw;}
-
-	public float getHeadYaw() {return this.headYaw;}
-
-	public boolean isBurning() {return this.isBurning;}
-
-	public boolean isOnGround() {return this.isOnGround;}
-
-	public int getRecentlyHit() {return this.recentlyHit;}
-
-	public int getHurtTime() {return this.hurtTime;}
-
-	public int getHurtResistantTime() {return this.hurtResistantTime;}
 }
