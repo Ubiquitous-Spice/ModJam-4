@@ -1,28 +1,24 @@
 package com.github.ubiquitousspice.bloodstains.client;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
-
-import org.lwjgl.input.Keyboard;
-
 import com.github.ubiquitousspice.bloodstains.CommonProxy;
 import com.github.ubiquitousspice.bloodstains.StainManager;
 import com.github.ubiquitousspice.bloodstains.data.BloodStain;
-
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
+import org.lwjgl.input.Keyboard;
+
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class ClientProxy extends CommonProxy
 {
@@ -36,9 +32,9 @@ public class ClientProxy extends CommonProxy
         
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
-        
-        RenderingRegistry.registerEntityRenderingHandler(PlaybackPlayer.class, new RenderPlayer());
-        //EntityRegistry.registerModEntity(PlaybackPlayer.class, "fakePlayer", 0, BloodStains.instance, 0, 0, false);
+
+		RenderingRegistry.registerEntityRenderingHandler(PlaybackPlayer.class, new RenderPlayback());
+		//EntityRegistry.registerModEntity(PlaybackPlayer.class, "fakePlayer", 0, BloodStains.instance, 0, 0, false);
     }
     
     // key stuff
