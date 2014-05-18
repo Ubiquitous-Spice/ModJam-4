@@ -12,7 +12,7 @@ public class PlayerStateContainer
 
 	final Queue<PlayerState> states;
 
-	public static final int MAX_TICKS = 400;
+	public static final int MAX_TICKS = 100;
 
 	public PlayerStateContainer(UUID uid, String username, PlayerState state)
 	{

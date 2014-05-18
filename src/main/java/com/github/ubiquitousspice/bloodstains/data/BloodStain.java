@@ -10,8 +10,6 @@ import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import com.google.common.collect.ImmutableList;
-
 @EqualsAndHashCode
 @ToString
 public class BloodStain
@@ -26,7 +24,13 @@ public class BloodStain
     {
         this.uid = container.uid;
         this.username = container.username;
-        states = ImmutableList.copyOf(container.states);
+        
+        {
+            states = new ArrayList<PlayerState>(PlayerStateContainer.MAX_TICKS);
+            for (int i = 0; i< PlayerStateContainer.MAX_TICKS; i++)
+                states.add(container.states.poll());
+        }
+        
         PlayerState firstState = states.get(0);
         dimId = firstState.getDimension();
         x = firstState.getX();

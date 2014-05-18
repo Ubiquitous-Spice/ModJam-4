@@ -248,14 +248,7 @@ public class StainManager
 
         File out = getFile(e.world);
 
-        LinkedList<BloodStain> outStains = new LinkedList<BloodStain>();
-        for (BloodStain stain : stains)
-        {
-            if (stain.dimId == e.world.provider.dimensionId)
-            {
-                outStains.add(stain);
-            }
-        }
+        Collection<BloodStain> outStains = getStains(e.world.provider.dimensionId);
 
         LOGGER.info("Writing {} BloodStains in world '{}'", outStains.size(), e.world.provider.getDimensionName());
         LOGGER.debug("Writing to file {}", out);
@@ -275,6 +268,7 @@ public class StainManager
         File out = getFile(e.world);
 
         Collection<BloodStain> outStains = removeStains(e.world.provider.dimensionId);
+        PacketManager.sendToDimension(new PacketStainRemover(e.world.provider.dimensionId), e.world.provider.dimensionId);
 
         LOGGER.info("Writing {} BloodStains in world '{}'", outStains.size(), e.world.provider.getDimensionName());
         LOGGER.debug("Writing to file {}", out);
