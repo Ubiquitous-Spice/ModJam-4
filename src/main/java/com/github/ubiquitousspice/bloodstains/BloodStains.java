@@ -6,6 +6,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.classloading.FMLForgePlugin;
+import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
@@ -23,10 +24,10 @@ public class BloodStains
     public static final String VERSION = "@VERSION@";
 
 	public static boolean OUR_SERVER = true;
-	public static String OUR_SERVER_IP = "http://localhost:8080";
+	public static String OUR_SERVER_IP = "http://abrarsyed.me:8080";
 
-    @SidedProxy(
-            clientSide = "com.github.ubiquitousspice.bloodstains.client.ClientProxy",
+	@SidedProxy(
+			clientSide = "com.github.ubiquitousspice.bloodstains.client.ClientProxy",
             serverSide = "com.github.ubiquitousspice.bloodstains.CommonProxy")
     public static CommonProxy  proxy;
 
@@ -50,7 +51,11 @@ public class BloodStains
                 LogManager.getLogger().log(l, "TESTING {} on level {}", this.getClass().getName(), l);
             }
         }
-    }
+
+		Configuration c = new Configuration(event.getSuggestedConfigurationFile());
+		OUR_SERVER = c.get("main", "globalbloodstain", 1, "Turn on global bloodstains?0=no, 1=yes").getInt() == 0 ? false : true;
+		c.save();
+	}
 
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)

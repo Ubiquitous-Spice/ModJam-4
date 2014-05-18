@@ -8,6 +8,7 @@ import com.github.ubiquitousspice.bloodstains.network.PacketManager;
 import com.github.ubiquitousspice.bloodstains.network.PacketStainRemover;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.net.UrlEscapers;
 import com.google.gag.annotation.literary.Metaphor;
 import com.google.gag.annotation.remark.Hack;
 import com.google.gson.Gson;
@@ -97,11 +98,10 @@ public class StainManager
 		{
 			try
 			{
-				String url = getUrl(null, stain.dimId);
+				String url = getUrl(((EntityPlayer) e.entity).getEntityWorld().getSaveHandler().getWorldDirectoryName(), stain.dimId);
 				LogManager.getLogger().debug("Uploading stain for {} at {}, {}, {} to {}", stain.username, stain.x, stain.y, stain.z, url);
 				HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 				con.setDoOutput(true);
-				//con.setDoInput(false);
 				con.setRequestMethod("PUT");
 				con.setUseCaches(false);
 				con.connect();
@@ -128,7 +128,7 @@ public class StainManager
 
 	private String getUrl(String worldId, int dimID)
 	{
-		return BloodStains.OUR_SERVER_IP + "/" + /*worldId*/"TODOIDHERE" + "SPACEEEEEEEEEEEEEEEEEEEEEEEER" + dimID;
+		return BloodStains.OUR_SERVER_IP + "/" + UrlEscapers.urlPathSegmentEscaper().escape(worldId) + "SPACEEEEEEEEEEEEEEEEEEEEEEEER" + dimID;
 	}
 
 	// util and packet UI
@@ -249,7 +249,7 @@ public class StainManager
 		{
 			try
 			{
-				String url = getUrl(null, e.world.provider.dimensionId);
+				String url = getUrl(e.world.getSaveHandler().getWorldDirectoryName(), e.world.provider.dimensionId);
 				LogManager.getLogger().debug("Downloading stains from {}", url);
 				HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 				con.setUseCaches(false);
