@@ -1,6 +1,11 @@
 package com.github.ubiquitousspice.bloodstains.data;
 
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+import com.github.ubiquitousspice.bloodstains.client.PlaybackPlayer;
+
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import net.minecraft.entity.Entity;
@@ -9,10 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 @EqualsAndHashCode
 @ToString
@@ -26,8 +28,20 @@ public class PlayerState
     private int         dimension;
     private double      x, y, z;
     private double      motX, motY, motZ;
-    private float       yaw, headYaw;
     
+    //
+    boolean sneaking;
+    
+    // rotation
+    private float       yawOffset, yaw, pitch, headYaw, cameraYaw, cameraPitch;
+    
+    // walk
+    private int         stepDist;
+    private float       walkDistMod, walkDistStepMod;
+
+    // swing
+    private int         itemUseCount;
+
     // hit and hurt data
     private int recentlyHit, hurtTime, hurtResistantTime, fireTime;
     private float health;
@@ -45,7 +59,7 @@ public class PlayerState
             armour[i] = player.inventory.armorInventory[i] == null ? null : player.inventory.armorInventory[i].copy();
         }
 
-        // location
+        // location and motion
         dimension = player.worldObj.provider.dimensionId;
         x = player.posX;
         y = player.posY;
@@ -53,8 +67,24 @@ public class PlayerState
         motX = player.motionX;
         motY = player.motionY;
         motZ = player.motionZ;
+        
+        sneaking = player.isSneaking();
+        
+        // rotations
+        yawOffset = player.renderYawOffset;
         yaw = player.rotationYaw;
+        pitch = player.rotationPitch;
         headYaw = player.rotationYawHead;
+        cameraYaw = player.cameraYaw;
+        cameraPitch = player.cameraPitch;
+        
+        // walking
+        stepDist = ObfuscationReflectionHelper.getPrivateValue(Entity.class, player, "nextStepDistance", "field_70150_b");
+        walkDistMod = ObfuscationReflectionHelper.getPrivateValue(Entity.class, player, "distanceWalkedModified", "field_70140_Q");
+        walkDistStepMod = ObfuscationReflectionHelper.getPrivateValue(Entity.class, player, "distanceWalkedOnStepModified", "field_82151_R");
+        
+        // item use
+        itemUseCount = ObfuscationReflectionHelper.getPrivateValue(EntityPlayer.class, player, "itemInUseCount", "field_71072_f");
 
         // burning and drowning
         isOnGround = player.onGround;
@@ -66,19 +96,43 @@ public class PlayerState
 
     private PlayerState() {}
     
-    public void applyTo(EntityPlayer player)
+    public void applyTo(PlaybackPlayer player)
     {
         player.inventory.setInventorySlotContents(player.inventory.currentItem, currentHeldItem);
         player.inventory.armorInventory = armour;
+        
+        player.setPositionAndRotation(x, y, z, yaw, pitch);
+        
+        // location and motion
         player.posX = x;
         player.posY = y;
         player.posZ = z;
         player.motionX = motX;
         player.motionY = motY;
         player.motionZ = motZ;
+        
+        player.setSneaking(sneaking);
 
-        player.rotationYawHead = headYaw;
+        // rotations
+        player.renderYawOffset = yawOffset;
         player.rotationYaw = yaw;
+        player.rotationPitch = pitch;
+        player.rotationYawHead = headYaw;
+        player.cameraYaw = cameraYaw;
+        player.cameraPitch = cameraPitch;
+        
+        // walking
+        ObfuscationReflectionHelper.setPrivateValue(Entity.class, player, stepDist, "nextStepDistance", "field_70150_b");
+        ObfuscationReflectionHelper.setPrivateValue(Entity.class, player, walkDistMod, "distanceWalkedModified", "field_70140_Q");
+        ObfuscationReflectionHelper.setPrivateValue(Entity.class, player, walkDistStepMod,"distanceWalkedOnStepModified", "field_82151_R");
+        
+        // swinging
+        ObfuscationReflectionHelper.setPrivateValue(EntityPlayer.class, player, itemUseCount, "itemInUseCount", "field_71072_f");
+        if (itemUseCount > 0)
+        {
+            //itemInUse
+            ObfuscationReflectionHelper.setPrivateValue(EntityPlayer.class, player, currentHeldItem, "itemInUse", "field_71074_e");
+        }
         
         player.setHealth(health);
         
@@ -102,13 +156,26 @@ public class PlayerState
         output.writeDouble(motX);
         output.writeDouble(motY);
         output.writeDouble(motZ);
+        
+        output.writeBoolean(sneaking);
+        
+        output.writeFloat(yawOffset);
         output.writeFloat(yaw);
+        output.writeFloat(pitch);
         output.writeFloat(headYaw);
+        output.writeFloat(cameraYaw);
+        output.writeFloat(cameraPitch);
         
         // states
         output.writeBoolean(isOnGround);
         output.writeInt(hurtTime);
         output.writeInt(fireTime);
+        
+        output.writeInt(stepDist);
+        output.writeFloat(walkDistMod);
+        output.writeFloat(walkDistStepMod);
+        
+        output.writeInt(itemUseCount);
         
         output.writeFloat(health);
     }
@@ -131,12 +198,25 @@ public class PlayerState
         state.motX = input.readDouble();
         state.motY = input.readDouble();
         state.motZ = input.readDouble();
+        
+        state.sneaking = input.readBoolean();
+        
+        state.yawOffset = input.readFloat();
         state.yaw = input.readFloat();
+        state.pitch =input.readFloat(); 
         state.headYaw = input.readFloat();
+        state.cameraYaw =input.readFloat(); 
+        state.cameraPitch = input.readFloat();
         
         state.isOnGround = input.readBoolean();
         state.hurtTime = input.readInt();
         state.fireTime = input.readInt();
+        
+        state.stepDist = input.readInt();
+        state.walkDistMod = input.readFloat();
+        state.walkDistStepMod = input.readFloat();
+        
+        state.itemUseCount = input.readInt();
         
         state.health = input.readFloat();
         
