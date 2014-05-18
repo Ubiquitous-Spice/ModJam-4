@@ -100,7 +100,7 @@ public class StainManager
         }
 
         // make stain, and clean.
-        BloodStain stain = container.getBloodStain();
+		final BloodStain stain = container.getBloodStain();
 
 		// send to all in world.
 		PacketManager.sendToDimension(new PacketCreateStain(stain), stain.dimId);
@@ -109,20 +109,33 @@ public class StainManager
 		{
 			try
 			{
-				String url = getUrl(((EntityPlayer) e.entity).getEntityWorld().getSaveHandler().getWorldDirectoryName(), stain.dimId);
+				final String url = getUrl(((EntityPlayer) e.entity).getEntityWorld().getSaveHandler().getWorldDirectoryName(), stain.dimId);
 				LogManager.getLogger().debug("Uploading stain for {} at {}, {}, {} to {}", stain.username, stain.x, stain.y, stain.z, url);
-				HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-				con.setDoOutput(true);
-				con.setRequestMethod("PUT");
-				con.setUseCaches(false);
-				con.connect();
-				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(con.getOutputStream());
-				outputStreamWriter.write(new Gson().toJson(stain));
-				outputStreamWriter.flush();
-				outputStreamWriter.close();
-				con.disconnect();
-				con.getInputStream().close();
-
+				new Thread()
+				{
+					public void run()
+					{
+						try
+						{
+							HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+							con.setDoOutput(true);
+							con.setRequestMethod("PUT");
+							con.setUseCaches(false);
+							con.connect();
+							OutputStreamWriter outputStreamWriter = new OutputStreamWriter(con.getOutputStream());
+							outputStreamWriter.write(new Gson().toJson(stain));
+							outputStreamWriter.flush();
+							outputStreamWriter.close();
+							con.disconnect();
+							con.getInputStream().close();
+							LogManager.getLogger().debug("Stain for {} at {}, {}, {} uploaded to {}", stain.username, stain.x, stain.y, stain.z, url);
+						}
+						catch (Exception r)
+						{
+							r.printStackTrace();
+						}
+					}
+				}.start();
 			}
 			catch (Exception r)
 			{
