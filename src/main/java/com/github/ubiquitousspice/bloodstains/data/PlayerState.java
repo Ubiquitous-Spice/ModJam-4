@@ -71,6 +71,9 @@ public class PlayerState
         player.motionY = motY;
         player.motionZ = motZ;
         
+        player.rotationYaw = yaw;
+        player.rotationYawHead = headYaw;
+        
         if (isBurning())
             player.setFire(1000);
         else

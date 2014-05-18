@@ -22,7 +22,7 @@ public class BloodStains
     public static final String MODID   = "bloodstains";
     public static final String VERSION = "@VERSION@";
 
-	public static boolean OUR_SERVER = true;
+	public static boolean OUR_SERVER = false;
 	public static String OUR_SERVER_IP = "http://localhost:8080";
 
     @SidedProxy(
