@@ -57,6 +57,6 @@ public class BloodStains
     {
         StainManager.init();
         PacketManager.init();
-        proxy.registerRenders();
+        proxy.doStuff();
     }
 }

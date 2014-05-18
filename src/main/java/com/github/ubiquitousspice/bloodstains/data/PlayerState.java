@@ -4,9 +4,11 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -33,7 +35,10 @@ public class PlayerState
     private float       yaw, headYaw;
 
     @Getter
-    private boolean     isBurning, isOnGround, isSwimming;
+    private boolean     isBurning, isOnGround;
+    
+    @Getter
+    private int recentlyHit, hurtTime, hurtResistantTime;
 
     public PlayerState(EntityPlayer player)
     {
@@ -59,10 +64,29 @@ public class PlayerState
         // burning and drowning
         isBurning = player.isBurning();
         isOnGround = player.onGround;
-        isSwimming = player.isInWater();
+        hurtTime = ObfuscationReflectionHelper.getPrivateValue(EntityLivingBase.class, player, "hurtTime", "field_70737_aN");
     }
 
     private PlayerState() {}
+    
+    public void applyTo(EntityPlayer player)
+    {
+        player.inventory.setInventorySlotContents(player.inventory.currentItem, currentHeldItem);
+        player.inventory.armorInventory = armour;
+        player.posX = x;
+        player.posY = y;
+        player.posZ = z;
+        player.motionX = motX;
+        player.motionY = motY;
+        player.motionZ = motZ;
+        
+        if (isBurning())
+            player.setFire(1000);
+        else
+            player.extinguish();
+        
+        ObfuscationReflectionHelper.setPrivateValue(EntityLivingBase.class, player, hurtTime, "hurtTime", "field_70737_aN");
+    }
 
     public void writeTo(DataOutput output) throws IOException
     {
@@ -86,7 +110,7 @@ public class PlayerState
         // states
         output.writeBoolean(isBurning);
         output.writeBoolean(isOnGround);
-        output.writeBoolean(isSwimming);
+        output.writeInt(hurtTime);
     }
 
     public static PlayerState readFrom(DataInput input) throws IOException
@@ -112,7 +136,7 @@ public class PlayerState
         
         state.isBurning = input.readBoolean();
         state.isOnGround = input.readBoolean();
-        state.isSwimming = input.readBoolean();
+        state.hurtTime = input.readInt();
         
         return state;
     }
