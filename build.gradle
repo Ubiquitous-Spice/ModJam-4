@@ -56,6 +56,7 @@ dependencies {
     compile 'com.google.gag:gag:1.0.1'
     
     packed 'com.github.jponge:lzma-java:1.3' // lzma
+
 }
 
 jar {

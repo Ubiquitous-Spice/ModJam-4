@@ -1,12 +1,7 @@
 package com.github.ubiquitousspice.bloodstains.data;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,30 +9,26 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 @EqualsAndHashCode
 @ToString
 public class PlayerState
 {
     // equipment
-    @Getter
     private ItemStack   currentHeldItem;
-    @Getter
     private ItemStack[] armour;
 
     // location
-    @Getter
     private int         dimension;
-    @Getter
     private double      x, y, z;
-    @Getter
     private double      motX, motY, motZ;
-    @Getter
     private float       yaw, headYaw;
 
-    @Getter
     private boolean     isBurning, isOnGround;
     
-    @Getter
     private int recentlyHit, hurtTime, hurtResistantTime;
 
     public PlayerState(EntityPlayer player)
@@ -169,4 +160,36 @@ public class PlayerState
         
         return null;
     }
+
+	public ItemStack getCurrentHeldItem() {return this.currentHeldItem;}
+
+	public ItemStack[] getArmour() {return this.armour;}
+
+	public int getDimension() {return this.dimension;}
+
+	public double getX() {return this.x;}
+
+	public double getY() {return this.y;}
+
+	public double getZ() {return this.z;}
+
+	public double getMotX() {return this.motX;}
+
+	public double getMotY() {return this.motY;}
+
+	public double getMotZ() {return this.motZ;}
+
+	public float getYaw() {return this.yaw;}
+
+	public float getHeadYaw() {return this.headYaw;}
+
+	public boolean isBurning() {return this.isBurning;}
+
+	public boolean isOnGround() {return this.isOnGround;}
+
+	public int getRecentlyHit() {return this.recentlyHit;}
+
+	public int getHurtTime() {return this.hurtTime;}
+
+	public int getHurtResistantTime() {return this.hurtResistantTime;}
 }

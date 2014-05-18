@@ -1,19 +1,16 @@
 package com.github.ubiquitousspice.bloodstains;
 
+import com.github.ubiquitousspice.bloodstains.network.PacketManager;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.classloading.FMLForgePlugin;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.ConsoleAppender.Target;
-
-import com.github.ubiquitousspice.bloodstains.network.PacketManager;
-
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = BloodStains.MODID, name = "BloodStains", version = BloodStains.VERSION)
 public class BloodStains
@@ -24,6 +21,9 @@ public class BloodStains
 
     public static final String MODID   = "bloodstains";
     public static final String VERSION = "@VERSION@";
+
+	public static boolean OUR_SERVER = true;
+	public static String OUR_SERVER_IP = "http://localhost:8080";
 
     @SidedProxy(
             clientSide = "com.github.ubiquitousspice.bloodstains.client.ClientProxy",

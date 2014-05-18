@@ -1,23 +1,10 @@
 package com.github.ubiquitousspice.bloodstains.network;
 
-import static cpw.mods.fml.relauncher.Side.CLIENT;
-import static cpw.mods.fml.relauncher.Side.SERVER;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-
-import java.util.EnumMap;
-
-import lombok.SneakyThrows;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
-
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
@@ -25,6 +12,18 @@ import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.Packet;
+
+import java.io.IOException;
+import java.util.EnumMap;
+
+import static cpw.mods.fml.relauncher.Side.CLIENT;
+import static cpw.mods.fml.relauncher.Side.SERVER;
 
 public class PacketManager extends FMLIndexedMessageToMessageCodec<PacketBase>
 {
@@ -55,17 +54,23 @@ public class PacketManager extends FMLIndexedMessageToMessageCodec<PacketBase>
     }
 
     @Override
-    @SneakyThrows
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf source, PacketBase msg)
     {
         ByteArrayDataInput input = ByteStreams.newDataInput(source.array());
         
         // the discriminator 
         input.skipBytes(1);
-        msg.decode(input);
+		try
+		{
+			msg.decode(input);
+		}
+		catch (IOException e)
+		{
+			Throwables.propagate(e);
+		}
 
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient())
-        {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient())
+		{
             actionClient(msg);
         }
         else
