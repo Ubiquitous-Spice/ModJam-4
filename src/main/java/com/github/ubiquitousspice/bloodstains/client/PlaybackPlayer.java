@@ -1,7 +1,6 @@
 package com.github.ubiquitousspice.bloodstains.client;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import net.minecraft.client.Minecraft;
@@ -31,15 +30,14 @@ public class PlaybackPlayer extends EntityOtherPlayerMP
         // convert states to a list of things that can eb safely popped off...
         states = new LinkedList<PlayerState>();
         states.addAll(stain.states);
-        //states = Lists.reverse(states);
-        
-        System.out.println("STARTING WITH SIZE="+states.size());
         
         this.capabilities.allowFlying = true;
         this.capabilities.isFlying = true;
         this.capabilities.allowEdit = false;
         
         this.dataWatcher = new DummyDataWatcher(this);
+        
+        this.setHealth(getMaxHealth());
     }
     
     @Override
@@ -48,13 +46,15 @@ public class PlaybackPlayer extends EntityOtherPlayerMP
         if (states.isEmpty())
         {
             // clean out.
-            this.setDead();
-            return;
+            this.setHealth(0);
+            //this.attackEntityFrom(DamageSource.outOfWorld, 1000f);
+            //this.kill();
+            //this.setDead();
+//            /return;
         }
         else
         {
             PlayerState state = states.poll();
-            System.out.println("Ticking --> "+state);
             state.applyTo(this);
         }
         
@@ -65,18 +65,28 @@ public class PlaybackPlayer extends EntityOtherPlayerMP
     // proper overrides
     
     @Override
-    public void setHealth(float par1) { }
+    public void setHealth(float par1)
+    {
+        if (!(dataWatcher instanceof DummyDataWatcher))
+        {
+            return;
+        }
+        else
+        {
+            super.setHealth(par1);
+        }
+    }
 
     // stolen from forge fakePlayer + some edits
     @Override protected void entityInit() {}
-    @Override public boolean attackEntityFrom(DamageSource source, float par2)  { return false;  }
+    //@Override public boolean attackEntityFrom(DamageSource source, float par2)  { return false;  }
     @Override public void addChatMessage(IChatComponent chat) {}
     @Override public void addChatComponentMessage(IChatComponent chat){}
     @Override public void addStat(StatBase par1StatBase, int par2){}
     @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z){}
-    @Override public boolean isEntityInvulnerable(){ return true; }
+    //@Override public boolean isEntityInvulnerable(){ return true; }
     @Override public boolean canAttackPlayer(EntityPlayer player){ return false; }
-    @Override public boolean hitByEntity(Entity par1Entity) { return false; }
+    //@Override public boolean hitByEntity(Entity par1Entity) { return false; }
     @Override public void onDeath(DamageSource source){ return; }
     @Override public void travelToDimension(int dim){ return; }
     @Override public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
