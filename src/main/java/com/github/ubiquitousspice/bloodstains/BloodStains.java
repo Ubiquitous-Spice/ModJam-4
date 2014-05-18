@@ -8,6 +8,8 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.ConsoleAppender.Target;
 
+import com.github.ubiquitousspice.bloodstains.network.PacketManager;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -25,7 +27,7 @@ public class BloodStains
 
     @SidedProxy(
             clientSide = "com.github.ubiquitousspice.bloodstains.client.ClientProxy",
-            serverSide = "com.github.ubiquitousspice.bloosstains.CommonProxy")
+            serverSide = "com.github.ubiquitousspice.bloodstains.CommonProxy")
     public static CommonProxy  proxy;
 
     @Mod.EventHandler
@@ -48,15 +50,13 @@ public class BloodStains
                 LogManager.getLogger().log(l, "TESTING {} on level {}", this.getClass().getName(), l);
             }
         }
-
-        // blocks and stuff.
-
     }
 
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
         StainManager.init();
+        PacketManager.init();
         proxy.registerRenders();
     }
 }
