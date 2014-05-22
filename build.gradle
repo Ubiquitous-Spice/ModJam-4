@@ -21,6 +21,9 @@ version = "1.0"
 group = "com.github.ubiquitousspice"
 archivesBaseName = "BloodStains"
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 minecraft {
     version = "1.7.2-10.12.1.1082"
     replaceIn "BloodStains.java"
